@@ -29,7 +29,7 @@ async function getNewClient() {
   return client;
 }
 
-const  database = {
+const database = {
   query,
   getNewClient,
 };
