@@ -1,9 +1,8 @@
-import database from "infra/database";
 import orchestrator from "tests/orchestrator.js";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
-  await database.query("drop schema public cascade; create schema public;");
+  await orchestrator.clearDatabase();
 });
 
 describe("GET to /api/v1/migrations", () => {
@@ -17,7 +16,8 @@ describe("GET to /api/v1/migrations", () => {
       expect(Array.isArray(responseBody)).toBe(true);
       expect(responseBody.length).toBeGreaterThan(0);
 
-      const result = await database.query("SELECT * FROM pgmigrations");
+      const result = await orchestrator.getDatabaseMigrations();
+      console.log(result);
       expect(result.rows.length).toBe(0);
     });
   });
