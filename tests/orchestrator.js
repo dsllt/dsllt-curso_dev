@@ -1,4 +1,5 @@
 import retry from "async-retry";
+import database from "infra/database";
 
 const webserverUrl = process.env.WEB_SERVER_URL;
 
@@ -20,8 +21,18 @@ async function waitForAllServices() {
   }
 }
 
+async function clearDatabase() {
+  await database.query("drop schema public cascade; create schema public;");
+}
+
+async function getDatabaseMigrations() {
+  return await database.query("SELECT * FROM pgmigrations");
+}
+
 const orchestrator = {
   waitForAllServices,
+  clearDatabase,
+  getDatabaseMigrations,
 };
 
 export default orchestrator;
