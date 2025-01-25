@@ -17,7 +17,6 @@ describe("GET to /api/v1/migrations", () => {
       expect(responseBody.length).toBeGreaterThan(0);
 
       const result = await orchestrator.getDatabaseMigrations();
-      console.log(result);
       expect(result.rows.length).toBe(0);
     });
   });
