@@ -54,3 +54,23 @@ export class MethodNotAllowedError extends Error {
     };
   }
 }
+
+export class MigrationServiceError extends Error {
+  constructor({ cause, message }) {
+    super(message || "Serviço indisponível no momento.", {
+      cause,
+    });
+    this.name = "MigrationServiceError";
+    this.action = "Verifique as migrations e conexão com o banco.";
+    this.statusCode = 500;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      action: this.action,
+      status_code: this.statusCode,
+    };
+  }
+}
