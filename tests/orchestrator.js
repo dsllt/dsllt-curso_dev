@@ -1,5 +1,6 @@
 import retry from "async-retry";
 import database from "infra/database";
+import migrator from "models/migrator";
 
 const webserverUrl = process.env.WEB_SERVER_URL;
 
@@ -29,10 +30,15 @@ async function getDatabaseMigrations() {
   return await database.query("SELECT * FROM pgmigrations");
 }
 
+async function runPendingMigrations() {
+  await migrator.runPendingMigrations();
+}
+
 const orchestrator = {
   waitForAllServices,
   clearDatabase,
   getDatabaseMigrations,
+  runPendingMigrations,
 };
 
 export default orchestrator;
