@@ -3,6 +3,59 @@ import database from "infra/database";
 import password from "models/password";
 import { NotFoundError, ValidationError } from "infra/errors";
 
+async function create(userInputValues) {
+  await validateUniqueUsername(userInputValues.username);
+  await validateUniqueEmail(userInputValues.email);
+  await hashPasswordInObject(userInputValues);
+
+  const newUser = runInsertQuery(userInputValues);
+  return newUser;
+
+  async function runInsertQuery(userInputValues) {
+    const result = await database.query({
+      text: `
+      INSERT INTO 
+        users (username, email, password) 
+      VALUES 
+        ($1, $2, $3)
+      RETURNING
+        *
+    ;`,
+      values: [
+        userInputValues.username,
+        userInputValues.email,
+        userInputValues.password,
+      ],
+    });
+
+    return result.rows[0];
+  }
+}
+
+async function findOneById(userId) {
+  const foundUser = await runSelectQuery(userId);
+
+  return foundUser;
+
+  async function runSelectQuery(userId) {
+    const result = await database.query({
+      text: `
+        SELECT 
+          *
+        FROM
+          users
+        WHERE
+          id = $1
+        LIMIT
+          1
+      `,
+      values: [userId],
+    });
+
+    return result.rows[0];
+  }
+}
+
 async function findOneByUsername(username) {
   const userFound = await runSelectQuery(username);
 
@@ -60,35 +113,6 @@ async function findOneByEmail(email) {
         action: "Verifique se o email está digitado corretamente.",
       });
     }
-
-    return result.rows[0];
-  }
-}
-
-async function create(userInputValues) {
-  await validateUniqueUsername(userInputValues.username);
-  await validateUniqueEmail(userInputValues.email);
-  await hashPasswordInObject(userInputValues);
-
-  const newUser = runInsertQuery(userInputValues);
-  return newUser;
-
-  async function runInsertQuery(userInputValues) {
-    const result = await database.query({
-      text: `
-      INSERT INTO 
-        users (username, email, password) 
-      VALUES 
-        ($1, $2, $3)
-      RETURNING
-        *
-    ;`,
-      values: [
-        userInputValues.username,
-        userInputValues.email,
-        userInputValues.password,
-      ],
-    });
 
     return result.rows[0];
   }
@@ -189,6 +213,7 @@ async function hashPasswordInObject(userInputValues) {
 
 const user = {
   create,
+  findOneById,
   findOneByUsername,
   findOneByEmail,
   update,

@@ -2,6 +2,7 @@ import { faker } from "@faker-js/faker";
 import retry from "async-retry";
 import database from "infra/database";
 import migrator from "models/migrator";
+import session from "models/session";
 import user from "models/user";
 
 const webserverUrl = process.env.WEB_SERVER_URL;
@@ -45,12 +46,17 @@ async function createUser(userObject) {
   });
 }
 
+async function createSession(userId) {
+  return await session.create(userId);
+}
+
 const orchestrator = {
   waitForAllServices,
   clearDatabase,
   getDatabaseMigrations,
   runPendingMigrations,
   createUser,
+  createSession,
 };
 
 export default orchestrator;
