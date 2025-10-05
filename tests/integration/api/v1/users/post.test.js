@@ -35,7 +35,7 @@ describe("POST to /api/v1/users", () => {
         password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
-        features: [],
+        features: ["read:activation_token"],
       });
       expect(uuidVersion(responseBody.id)).toBe(4);
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
