@@ -1,6 +1,7 @@
 import email from "infra/email";
 import database from "infra/database";
 import webserver from "infra/webserver";
+import { NotFoundError } from "infra/errors";
 
 const EXPIRATION_IN_MILLISECONDS = 60 * 15 * 1000; // 15 minutes
 
@@ -43,11 +44,11 @@ Equipe CoffeeTab`,
   email.send(emailOptions);
 }
 
-async function findOneByUserId(userId) {
-  const foundToken = await runSelectQuery(userId);
+async function findOneValidById(tokenId) {
+  const foundToken = await runSelectQuery(tokenId);
   return foundToken;
 
-  async function runSelectQuery(userId) {
+  async function runSelectQuery(tokenId) {
     const result = await database.query({
       text: `
         SELECT 
@@ -55,12 +56,22 @@ async function findOneByUserId(userId) {
         FROM
           user_activation_tokens
         WHERE
-          user_id = $1
+          id = $1
+          AND expires_at > NOW()
+          AND used_at is NULL
         LIMIT
           1
       `,
-      values: [userId],
+      values: [tokenId],
     });
+
+    if (result.rowCount === 0) {
+      throw new NotFoundError({
+        message:
+          "O token de ativação não foi encontrado no sistema ou expirou.",
+        action: "Faça um novo cadastro.",
+      });
+    }
 
     return result.rows[0];
   }
@@ -69,7 +80,7 @@ async function findOneByUserId(userId) {
 const activation = {
   create,
   sendEmailToUser,
-  findOneByUserId,
+  findOneValidById,
 };
 
 export default activation;
