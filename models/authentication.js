@@ -10,8 +10,6 @@ async function getAuthenticatedUser(providedEmail, providedPassword) {
     return storedUser;
   } catch (error) {
     if (error instanceof UnauthorizedError) {
-      console.log(error.name);
-      console.log(error.message);
       throw new UnauthorizedError({
         message: "Dados de autenticação não conferem.",
         action: "Verifique se os dados enviados estão corretos.",
@@ -20,7 +18,7 @@ async function getAuthenticatedUser(providedEmail, providedPassword) {
     throw error;
   }
 
-  async function findUserByEmail() {
+  async function findUserByEmail(providedEmail) {
     let storedUser;
     try {
       storedUser = await user.findOneByEmail(providedEmail);
