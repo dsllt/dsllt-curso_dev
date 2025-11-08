@@ -3,6 +3,7 @@ import retry from "async-retry";
 import database from "infra/database";
 import migrator from "models/migrator";
 import session from "models/session";
+import activation from "models/activation";
 import user from "models/user";
 
 const webserverUrl = process.env.WEB_SERVER_URL;
@@ -62,6 +63,9 @@ async function createUser(userObject) {
   });
 }
 
+async function activateUser(user) {
+  return await activation.activateUserById(user.id);
+}
 async function createSession(userId) {
   return await session.create(userId);
 }
@@ -104,6 +108,7 @@ const orchestrator = {
   deleteAllEmails,
   getLastEmail,
   extractUuid,
+  activateUser,
 };
 
 export default orchestrator;
