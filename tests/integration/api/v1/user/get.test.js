@@ -9,12 +9,31 @@ beforeAll(async () => {
 });
 
 describe("GET to /api/v1/user", () => {
+  describe("Anonymous user", () => {
+    test("Retrieving endpoint", async () => {
+      const response = await fetch("http://localhost:3000/api/v1/user", {
+        method: "GET",
+      });
+
+      expect(response.status).toBe(403);
+
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
+        name: "ForbiddenError",
+        status_code: 403,
+        message: "Você não possui permissão para executar esta ação.",
+        action: `Verifique se seu usuário possui a feature read:session`,
+      });
+    });
+  });
   describe("Default user", () => {
     test("With valid session", async () => {
       const createdUser = await orchestrator.createUser({
         username: "userWithValidSession",
       });
 
+      const activeUser = await orchestrator.activateUser(createdUser);
       const sessionObject = await orchestrator.createSession(createdUser.id);
 
       const response = await fetch("http://localhost:3000/api/v1/user", {
@@ -39,8 +58,8 @@ describe("GET to /api/v1/user", () => {
         email: createdUser.email,
         password: createdUser.password,
         created_at: createdUser.created_at.toISOString(),
-        updated_at: createdUser.updated_at.toISOString(),
-        features: ["read:activation_token"],
+        updated_at: activeUser.updated_at.toISOString(),
+        features: ["create:session", "read:session"],
       });
 
       // session renewal assertions
@@ -123,6 +142,7 @@ describe("GET to /api/v1/user", () => {
       const createdUser = await orchestrator.createUser({
         username: "userWithOldSession",
       });
+      const activeUser = await orchestrator.activateUser(createdUser);
 
       jest.useFakeTimers({
         now: new Date(Date.now() - session.EXPIRATION_IN_MILLISECONDS / 2),
@@ -147,8 +167,8 @@ describe("GET to /api/v1/user", () => {
         email: createdUser.email,
         password: createdUser.password,
         created_at: createdUser.created_at.toISOString(),
-        updated_at: createdUser.updated_at.toISOString(),
-        features: ["read:activation_token"],
+        updated_at: activeUser.updated_at.toISOString(),
+        features: ["create:session", "read:session"],
       });
 
       // session renewal assertions

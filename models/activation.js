@@ -80,7 +80,7 @@ async function findOneValidById(tokenId) {
 
 async function activate(tokenId) {
   const updatedToken = await runUpdateQuery(tokenId);
-  activateUserById(updatedToken.user_id);
+  await activateUserById(updatedToken.user_id);
   return updatedToken;
 
   async function runUpdateQuery(tokenId) {
@@ -104,7 +104,7 @@ async function activate(tokenId) {
 }
 
 async function activateUserById(userId) {
-  const userFeature = ["create:session"];
+  const userFeature = ["create:session", "read:session"];
   const updatedUser = await user.setFeatures(userId, userFeature);
   return updatedUser;
 }
@@ -114,6 +114,7 @@ const activation = {
   sendEmailToUser,
   findOneValidById,
   activate,
+  activateUserById,
 };
 
 export default activation;
