@@ -12,9 +12,11 @@ describe("Use case: Registration flow (all successful)", () => {
     await orchestrator.waitForAllServices();
     await orchestrator.runPendingMigrations();
   });
+
   beforeAll(async () => {
     await orchestrator.clearDatabase();
   });
+
   test("Create user account", async () => {
     const response = await fetch("http://localhost:3000/api/v1/users", {
       method: "POST",
@@ -42,6 +44,7 @@ describe("Use case: Registration flow (all successful)", () => {
       features: ["read:activation_token"],
     });
   });
+
   test("Receive activation email", async () => {
     const lastEmail = await orchestrator.getLastEmail();
     const emailActivationToken = orchestrator.extractUuid(lastEmail.text);
@@ -60,6 +63,7 @@ describe("Use case: Registration flow (all successful)", () => {
     expect(createUserResponseBody.id).toBe(activationTokenObject.user_id);
     expect(activationTokenObject.used_at).toBe(null);
   });
+
   test("Activate account", async () => {
     const activationResponse = await fetch(
       `http://localhost:3000/api/v1/activations/${activationTokenId}`,
@@ -75,6 +79,7 @@ describe("Use case: Registration flow (all successful)", () => {
     const activationUser = await user.findOneByUsername("RegistrationFlow");
     expect(activationUser.features).toEqual(["create:session", "read:session"]);
   });
+
   test("Login", async () => {
     const createSessionResponse = await fetch(
       `http://localhost:3000/api/v1/sessions`,
@@ -109,5 +114,26 @@ describe("Use case: Registration flow (all successful)", () => {
 
     const userResponseBody = await response.json();
     expect(userResponseBody.id).toEqual(createUserResponseBody.id);
+  });
+
+  test("Reject multiple activation", async () => {
+    const activationResponse = await fetch(
+      `http://localhost:3000/api/v1/activations/${activationTokenId}`,
+      {
+        method: "PATCH",
+        headers: {
+          Cookie: `session_id=${createSessionResponseBody.token}`,
+        },
+      },
+    );
+    expect(activationResponse.status).toBe(403);
+
+    const activationResponseBody = await activationResponse.json();
+    expect(activationResponseBody).toEqual({
+      name: "ForbiddenError",
+      status_code: 403,
+      message: "Você não possui permissão para executar esta ação.",
+      action: `Verifique se seu usuário possui a feature read:activation_token`,
+    });
   });
 });
