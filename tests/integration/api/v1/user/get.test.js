@@ -59,7 +59,12 @@ describe("GET to /api/v1/user", () => {
         password: createdUser.password,
         created_at: createdUser.created_at.toISOString(),
         updated_at: activeUser.updated_at.toISOString(),
-        features: ["create:session", "read:session"],
+        features: [
+          "create:session",
+          "read:session",
+          "read:user",
+          "update:user",
+        ],
       });
 
       // session renewal assertions
@@ -168,7 +173,12 @@ describe("GET to /api/v1/user", () => {
         password: createdUser.password,
         created_at: createdUser.created_at.toISOString(),
         updated_at: activeUser.updated_at.toISOString(),
-        features: ["create:session", "read:session"],
+        features: [
+          "create:session",
+          "read:session",
+          "read:user",
+          "update:user",
+        ],
       });
 
       // session renewal assertions

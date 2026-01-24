@@ -113,7 +113,12 @@ async function activateUserById(userId) {
       action: "Entre em contato com o suporte.",
     });
   }
-  const userFeature = ["create:session", "read:session"];
+  const userFeature = [
+    "create:session",
+    "read:session",
+    "read:user",
+    "update:user",
+  ];
   const updatedUser = await user.setFeatures(userId, userFeature);
   return updatedUser;
 }
