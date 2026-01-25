@@ -3,6 +3,7 @@ import controller from "infra/controller";
 import user from "models/user";
 import session from "models/session";
 import { ForbiddenError } from "infra/errors";
+import authorization from "models/authorization";
 
 /**
  * @param {NextApiRequest} request
@@ -43,6 +44,18 @@ async function getHandler(request, response) {
 async function patchHandler(request, response) {
   const username = request.query.username;
   const userInputValues = request.body;
+
+  const userTryingToPatch = request.context.user;
+  const targetUser = await user.findOneByUsername(username);
+
+  if (!authorization.can(userTryingToPatch, "update:user", targetUser)) {
+    throw new ForbiddenError({
+      message: "Você não possui permissão para atualizar outro usuário.",
+      action:
+        "Verifique se possui a feature necessária para atualizar outro usuário.",
+    });
+  }
+
   const updatedUser = await user.update(username, userInputValues);
   return response.status(200).json(updatedUser);
 }
