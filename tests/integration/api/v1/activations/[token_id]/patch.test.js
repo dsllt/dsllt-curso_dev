@@ -132,6 +132,7 @@ describe("PATCH to /api/v1/activations/[token_id]", () => {
         "read:session",
         "read:user",
         "update:user",
+        "read:status",
       ]);
     });
 

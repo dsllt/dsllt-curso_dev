@@ -1,7 +1,6 @@
 import { createRouter } from "next-connect";
 import controller from "infra/controller";
 import user from "models/user";
-import session from "models/session";
 import { ForbiddenError } from "infra/errors";
 import authorization from "models/authorization";
 
@@ -20,25 +19,24 @@ router.patch(controller.canRequest("update:user"), patchHandler);
 export default router.handler(controller.errorHandlers);
 
 async function getHandler(request, response) {
-  const sessionToken = request.cookies.session_id;
-  const sessionObject = await session.findOneValidByToken(sessionToken);
-  await session.renew(sessionObject.id);
-
-  const userByToken = await user.findOneById(sessionObject.user_id);
+  const userTryingToGet = request.context.user;
   const username = request.query.username;
   const userFound = await user.findOneByUsername(username);
 
-  if (
-    !userByToken.features.includes("read:user") ||
-    userByToken.username.toLowerCase() !== username.toLowerCase()
-  ) {
+  if (userTryingToGet.username.toLowerCase() !== username.toLowerCase()) {
     throw new ForbiddenError({
       message: "Você não possui permissão para executar esta ação.",
       action: "Entre em contato com o suporte.",
     });
   }
 
-  return response.status(200).json(userFound);
+  const secureOutputValue = authorization.filterOutput(
+    userTryingToGet,
+    "read:user",
+    userFound,
+  );
+
+  return response.status(200).json(secureOutputValue);
 }
 
 async function patchHandler(request, response) {
@@ -57,5 +55,12 @@ async function patchHandler(request, response) {
   }
 
   const updatedUser = await user.update(username, userInputValues);
-  return response.status(200).json(updatedUser);
+
+  const secureOutputValue = authorization.filterOutput(
+    userTryingToPatch,
+    "read:user",
+    updatedUser,
+  );
+
+  return response.status(200).json(secureOutputValue);
 }

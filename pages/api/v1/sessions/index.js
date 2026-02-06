@@ -2,6 +2,8 @@ import { createRouter } from "next-connect";
 import controller from "infra/controller";
 import authentication from "models/authentication";
 import session from "models/session";
+import authorization from "models/authorization";
+import { ForbiddenError } from "infra/errors";
 
 /**
  * @param {NextApiRequest} request
@@ -24,22 +26,39 @@ async function postHandler(request, response) {
     userInputValues.email,
     userInputValues.password,
   );
+  if (!authorization.can(authenticatedUser, "create:session")) {
+    throw new ForbiddenError({
+      message: "Você não possui permissão para fazer login.",
+      action: "Contate o suporte caso você acredito que isso seja um erro.",
+    });
+  }
 
   const userSession = await session.create(authenticatedUser.id);
 
   controller.setSessionCookie(response, userSession.token);
 
-  return response.status(201).json(userSession);
+  const secureOutputValue = authorization.filterOutput(
+    authenticatedUser,
+    "read:session",
+    userSession,
+  );
+
+  return response.status(201).json(secureOutputValue);
 }
 
 async function deleteHandler(request, response) {
   const sessionToken = request.cookies.session_id;
-
   const sessionObject = await session.findOneValidByToken(sessionToken);
-
   const expiredSession = await session.expireById(sessionObject.id);
+  const userTryingToDelete = request.context.user;
 
   controller.clearSessionCookie(response);
 
-  return response.status(200).json(expiredSession);
+  const secureOutputValue = authorization.filterOutput(
+    userTryingToDelete,
+    "read:session",
+    expiredSession,
+  );
+
+  return response.status(200).json(secureOutputValue);
 }

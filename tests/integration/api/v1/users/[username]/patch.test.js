@@ -203,8 +203,6 @@ describe("PATCH to /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: "uniqueUser2",
-        email: createdUser1.email,
-        password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
         features: [
@@ -212,6 +210,7 @@ describe("PATCH to /api/v1/users/[username]", () => {
           "read:session",
           "read:user",
           "update:user",
+          "read:status",
         ],
       });
       expect(uuidVersion(responseBody.id)).toBe(4);
@@ -248,8 +247,6 @@ describe("PATCH to /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: createdUser.username,
-        email: "uniqueEmail2@email.com",
-        password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
         features: [
@@ -257,6 +254,7 @@ describe("PATCH to /api/v1/users/[username]", () => {
           "read:session",
           "read:user",
           "update:user",
+          "read:status",
         ],
       });
       expect(uuidVersion(responseBody.id)).toBe(4);
@@ -293,8 +291,6 @@ describe("PATCH to /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: createdUser.username,
-        email: createdUser.email,
-        password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
         features: [
@@ -302,6 +298,7 @@ describe("PATCH to /api/v1/users/[username]", () => {
           "read:session",
           "read:user",
           "update:user",
+          "read:status",
         ],
       });
       expect(uuidVersion(responseBody.id)).toBe(4);
@@ -357,8 +354,6 @@ describe("PATCH to /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         id: defaultUser.id,
         username: "AlteradoPorPrivilegiado",
-        email: defaultUser.email,
-        password: defaultUser.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
         features: ["read:activation_token"],

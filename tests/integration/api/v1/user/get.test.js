@@ -56,7 +56,6 @@ describe("GET to /api/v1/user", () => {
         id: createdUser.id,
         username: "userWithValidSession",
         email: createdUser.email,
-        password: createdUser.password,
         created_at: createdUser.created_at.toISOString(),
         updated_at: activeUser.updated_at.toISOString(),
         features: [
@@ -64,6 +63,7 @@ describe("GET to /api/v1/user", () => {
           "read:session",
           "read:user",
           "update:user",
+          "read:status",
         ],
       });
 
@@ -170,7 +170,6 @@ describe("GET to /api/v1/user", () => {
         id: createdUser.id,
         username: "userWithOldSession",
         email: createdUser.email,
-        password: createdUser.password,
         created_at: createdUser.created_at.toISOString(),
         updated_at: activeUser.updated_at.toISOString(),
         features: [
@@ -178,6 +177,7 @@ describe("GET to /api/v1/user", () => {
           "read:session",
           "read:user",
           "update:user",
+          "read:status",
         ],
       });
 

@@ -32,8 +32,6 @@ describe("GET to /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: "MesmoCase",
-        email: "MesmoCase@email.com",
-        password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
         features: [
@@ -41,6 +39,7 @@ describe("GET to /api/v1/users/[username]", () => {
           "read:session",
           "read:user",
           "update:user",
+          "read:status",
         ],
       });
       expect(uuidVersion(responseBody.id)).toBe(4);
@@ -70,8 +69,6 @@ describe("GET to /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: "CaseDiferente",
-        email: "CaseDiferente@email.com",
-        password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
         features: [
@@ -79,6 +76,7 @@ describe("GET to /api/v1/users/[username]", () => {
           "read:session",
           "read:user",
           "update:user",
+          "read:status",
         ],
       });
       expect(uuidVersion(responseBody.id)).toBe(4);
