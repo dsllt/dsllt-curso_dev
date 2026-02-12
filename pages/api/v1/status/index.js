@@ -1,39 +1,34 @@
 import controller from "infra/controller";
-import database from "infra/database.js";
 import { createRouter } from "next-connect";
+import authorization from "models/authorization";
+import databaseStatus from "models/database-status";
 
 const router = createRouter();
+router.use(controller.injectAnonymousOrUser);
 router.get(getHandler);
 
 export default router.handler(controller.errorHandlers);
 
 async function getHandler(request, response) {
+  const userTryingToGet = request.context.user;
   const updatedAt = new Date().toISOString();
-  const databaseVersionResult = await database.query("SHOW server_version;");
-  const databaseVersionValue = databaseVersionResult.rows[0].server_version;
-  const databaseMaxConnectionsResult = await database.query(
-    "SHOW max_connections;",
-  );
-  const databaseMaxConnectionsValue = parseInt(
-    databaseMaxConnectionsResult.rows[0].max_connections,
-  );
-
-  const databaseName = process.env.POSTGRES_DB;
-  const databaseOpenedConnectionsResult = await database.query({
-    text: "SELECT count(*)::int FROM pg_stat_activity WHERE datname = $1;",
-    values: [databaseName],
-  });
+  const databaseVersionValue = await databaseStatus.getVersion();
+  const databaseMaxConnectionsValue = await databaseStatus.getMaxConnections();
   const databaseOpenedConnectionsValue =
-    databaseOpenedConnectionsResult.rows[0].count;
+    await databaseStatus.getOpenedConnections();
 
-  response.status(200).json({
+  const output = {
     updated_at: updatedAt,
-    dependencies: {
-      database: {
-        version: databaseVersionValue,
-        max_connections: databaseMaxConnectionsValue,
-        opened_connections: databaseOpenedConnectionsValue,
-      },
-    },
-  });
+    version: databaseVersionValue,
+    max_connections: databaseMaxConnectionsValue,
+    opened_connections: databaseOpenedConnectionsValue,
+  };
+
+  const secureOutputValue = authorization.filterOutput(
+    userTryingToGet,
+    "read:status",
+    output,
+  );
+
+  return response.status(200).json(secureOutputValue);
 }
