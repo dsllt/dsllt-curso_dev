@@ -118,7 +118,7 @@ function filterOutput(user, feature, resource) {
         },
       },
     };
-    if (user.features.includes("read:status:admin")) {
+    if (user.features.includes("read:status:all")) {
       output.dependencies.database.version = resource.version;
       return output;
     }
