@@ -18,7 +18,7 @@ describe("Use case: Registration flow (all successful)", () => {
   });
 
   test("Create user account", async () => {
-    const response = await fetch("http://localhost:3000/api/v1/users", {
+    const response = await fetch(`${webserver.origin}/api/v1/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -55,7 +55,7 @@ describe("Use case: Registration flow (all successful)", () => {
     expect(lastEmail.subject).toBe("Ative seu cadastro");
     expect(lastEmail.text).toContain("RegistrationFlow");
     expect(lastEmail.text).toContain(
-      `https://${webserver.origin}/cadastro/ativar/${activationTokenId}`,
+      `${webserver.origin}/cadastro/ativar/${activationTokenId}`,
     );
     expect(emailActivationToken).toBe(activationTokenId);
     expect(createUserResponseBody.id).toBe(activationTokenObject.user_id);
@@ -64,7 +64,7 @@ describe("Use case: Registration flow (all successful)", () => {
 
   test("Activate account", async () => {
     const activationResponse = await fetch(
-      `http://localhost:3000/api/v1/activations/${activationTokenId}`,
+      `${webserver.origin}/api/v1/activations/${activationTokenId}`,
       {
         method: "PATCH",
       },
@@ -86,7 +86,7 @@ describe("Use case: Registration flow (all successful)", () => {
 
   test("Login", async () => {
     const createSessionResponse = await fetch(
-      `http://localhost:3000/api/v1/sessions`,
+      `${webserver.origin}/api/v1/sessions`,
       {
         method: "POST",
         headers: {
@@ -107,7 +107,7 @@ describe("Use case: Registration flow (all successful)", () => {
   });
 
   test("Get user information", async () => {
-    const response = await fetch("http://localhost:3000/api/v1/user", {
+    const response = await fetch(`${webserver.origin}/api/v1/user`, {
       method: "GET",
       headers: {
         Cookie: `session_id=${createSessionResponseBody.token}`,
@@ -122,7 +122,7 @@ describe("Use case: Registration flow (all successful)", () => {
 
   test("Reject multiple activation", async () => {
     const activationResponse = await fetch(
-      `http://localhost:3000/api/v1/activations/${activationTokenId}`,
+      `${webserver.origin}/api/v1/activations/${activationTokenId}`,
       {
         method: "PATCH",
         headers: {
