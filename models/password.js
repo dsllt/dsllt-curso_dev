@@ -1,4 +1,3 @@
-// secretlint-disable @secretlint/secretlint-rule-pattern
 import bcryptjs from "bcryptjs";
 
 async function hash(password) {

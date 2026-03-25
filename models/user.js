@@ -1,4 +1,3 @@
-// secretlint-disable @secretlint/secretlint-rule-pattern
 import database from "infra/database";
 import password from "models/password";
 import { NotFoundError, ValidationError } from "infra/errors";
