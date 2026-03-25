@@ -3,6 +3,7 @@ import fs from "node:fs";
 import { resolve } from "node:path";
 const migrationName = `${Date.now()}_test_migration_dummy`;
 const migrationPath = resolve("infra", "migrations", `${migrationName}.js`);
+import webserver from "infra/webserver";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -13,7 +14,7 @@ beforeAll(async () => {
 describe("POST to /api/v1/migrations", () => {
   describe("Anonymous user", () => {
     test("Running pending migrations", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/migrations", {
+      const response = await fetch(`${webserver.origin}/api/v1/migrations`, {
         method: "POST",
       });
 
@@ -45,7 +46,7 @@ describe("POST to /api/v1/migrations", () => {
       }
     });
     test("Running pending migrations", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/migrations", {
+      const response = await fetch(`${webserver.origin}/api/v1/migrations`, {
         method: "POST",
         headers: {
           Cookie: `session_id=${token}`,
@@ -92,15 +93,12 @@ describe("POST to /api/v1/migrations", () => {
       `;
         fs.writeFileSync(migrationPath, migrationContent);
 
-        const response = await fetch(
-          "http://localhost:3000/api/v1/migrations",
-          {
-            method: "POST",
-            headers: {
-              Cookie: `session_id=${token}`,
-            },
+        const response = await fetch(`${webserver.origin}/api/v1/migrations`, {
+          method: "POST",
+          headers: {
+            Cookie: `session_id=${token}`,
           },
-        );
+        });
 
         const responseBody = await response.json();
 
@@ -109,15 +107,12 @@ describe("POST to /api/v1/migrations", () => {
       });
 
       test("For the second time", async () => {
-        const response = await fetch(
-          "http://localhost:3000/api/v1/migrations",
-          {
-            method: "POST",
-            headers: {
-              Cookie: `session_id=${token}`,
-            },
+        const response = await fetch(`${webserver.origin}/api/v1/migrations`, {
+          method: "POST",
+          headers: {
+            Cookie: `session_id=${token}`,
           },
-        );
+        });
 
         const responseBody = await response.json();
 
