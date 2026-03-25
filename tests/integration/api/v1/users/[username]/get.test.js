@@ -15,7 +15,7 @@ describe("GET to /api/v1/users/[username]", () => {
         email: "MesmoCase@email.com",
       });
       await orchestrator.activateUser(createdUser);
-      const sessionObject = await orchestrator.createSession(createdUser.id);
+      const sessionObject = await orchestrator.createSession(createdUser);
 
       const response = await fetch(
         "http://localhost:3000/api/v1/users/MesmoCase",
@@ -53,7 +53,7 @@ describe("GET to /api/v1/users/[username]", () => {
         email: "CaseDiferente@email.com",
       });
       const activatedUser = await orchestrator.activateUser(createdUser);
-      const sessionObject = await orchestrator.createSession(activatedUser.id);
+      const sessionObject = await orchestrator.createSession(activatedUser);
 
       const response = await fetch(
         "http://localhost:3000/api/v1/users/casediferente",
@@ -87,7 +87,7 @@ describe("GET to /api/v1/users/[username]", () => {
     test("With nonexistent username", async () => {
       const createdUser = await orchestrator.createUser();
       await orchestrator.activateUser(createdUser);
-      const sessionObject = await orchestrator.createSession(createdUser.id);
+      const sessionObject = await orchestrator.createSession(createdUser);
 
       const response = await fetch(
         "http://localhost:3000/api/v1/users/UsuarioInexistente",
@@ -114,7 +114,7 @@ describe("GET to /api/v1/users/[username]", () => {
         username: "logged",
       });
       await orchestrator.activateUser(loggedUser);
-      const sessionObject = await orchestrator.createSession(loggedUser.id);
+      const sessionObject = await orchestrator.createSession(loggedUser);
       await orchestrator.createUser({
         username: "notLogged",
       });

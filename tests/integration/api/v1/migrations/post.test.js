@@ -34,9 +34,8 @@ describe("POST to /api/v1/migrations", () => {
     beforeAll(async () => {
       const privilegedUser = await orchestrator.createUser();
       await orchestrator.activateUser(privilegedUser);
-      const sessionObjectPrivilegedUser = await orchestrator.createSession(
-        privilegedUser.id,
-      );
+      const sessionObjectPrivilegedUser =
+        await orchestrator.createSession(privilegedUser);
       token = sessionObjectPrivilegedUser.token;
     });
 
@@ -72,9 +71,8 @@ describe("POST to /api/v1/migrations", () => {
       await orchestrator.addFeaturesToUser(privilegedUser, [
         "create:migration",
       ]);
-      const sessionObjectPrivilegedUser = await orchestrator.createSession(
-        privilegedUser.id,
-      );
+      const sessionObjectPrivilegedUser =
+        await orchestrator.createSession(privilegedUser);
       token = sessionObjectPrivilegedUser.token;
     });
 
