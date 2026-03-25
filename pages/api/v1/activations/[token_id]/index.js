@@ -4,12 +4,10 @@ import authorization from "models/authorization";
 
 const { createRouter } = require("next-connect");
 
-const router = createRouter();
-
-router.use(controller.injectAnonymousOrUser);
-router.patch(controller.canRequest("read:activation_token"), patchHandler);
-
-export default router.handler(controller.errorHandlers);
+export default createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .patch(controller.canRequest("read:activation_token"), patchHandler)
+  .handler(controller.errorHandlers);
 
 async function patchHandler(request, response) {
   const tokenId = request.query.token_id;
