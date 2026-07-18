@@ -37,7 +37,7 @@ async function sendEmailToUser(user, activationToken) {
     subject: "Ative seu cadastro",
     text: `${user.username}, clique no link abaixo para ativar seu email
     
-https://${webserver.origin}/cadastro/ativar/${activationToken.id}
+${webserver.origin}/cadastro/ativar/${activationToken.id}
 
 Atenciosamente,
 Equipe CoffeeTab`,
