@@ -60,7 +60,6 @@ async function findOneValidById(tokenId) {
         WHERE
           id = $1
           AND expires_at > NOW()
-          AND used_at is NULL
         LIMIT
           1
       `,
@@ -104,10 +103,14 @@ async function activate(tokenId) {
   }
 }
 
-async function activateUserById(userId) {
-  const userToActivate = await user.findOneById(userId);
+async function activateUserById(validActivationToken) {
+  console.log(validActivationToken);
+  const userToActivate = await user.findOneById(validActivationToken.user_id);
 
-  if (!authorization.can(userToActivate, "read:activation_token")) {
+  if (
+    !authorization.can(userToActivate, "read:activation_token") &&
+    validActivationToken.expires_at < new Date()
+  ) {
     throw new ForbiddenError({
       message: "Você não pode mais utilizar tokens de ativação.",
       action: "Entre em contato com o suporte.",
@@ -120,7 +123,10 @@ async function activateUserById(userId) {
     "update:user",
     "read:status",
   ];
-  const updatedUser = await user.setFeatures(userId, userFeature);
+  const updatedUser = await user.setFeatures(
+    validActivationToken.user_id,
+    userFeature,
+  );
   return updatedUser;
 }
 

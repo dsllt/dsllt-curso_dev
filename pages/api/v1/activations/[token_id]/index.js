@@ -12,7 +12,7 @@ export default createRouter()
 async function patchHandler(request, response) {
   const tokenId = request.query.token_id;
   const validActivationToken = await activation.findOneValidById(tokenId);
-  await activation.activateUserById(validActivationToken.user_id);
+  await activation.activateUserById(validActivationToken);
   const usedActivationToken = await activation.activate(tokenId);
 
   const userTryingToPatch = request.context.user;
